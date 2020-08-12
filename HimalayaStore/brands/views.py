@@ -10,6 +10,7 @@ from django.core.exceptions import EmptyResultSet
 from rest_framework.decorators import api_view
 
 class BrandView(APIView):
+    permission_classes = [(IsAuthenticated)]
 
     def get(self, request, pk=None):
         try:
@@ -123,6 +124,7 @@ class BrandView(APIView):
             return Response(response,status=400)
 
 @api_view(['GET',])
+@permission_classes([IsAuthenticated])
 def get_brands(request,pk):
     try:
         queryset=BrandModel.objects.all().filter(item=pk)

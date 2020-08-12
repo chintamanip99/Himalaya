@@ -8,6 +8,7 @@ from .serializers import ItemSerializer
 from django.core.exceptions import EmptyResultSet
 
 class ItemView(APIView):
+    permission_classes = [(IsAuthenticated)]
 
     def get(self, request, pk=None):
         try:
