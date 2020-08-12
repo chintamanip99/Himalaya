@@ -4,7 +4,6 @@ from rest_framework.response import Response
 from rest_framework.decorators import api_view,renderer_classes,permission_classes
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.pagination import PageNumberPagination
-
 from django.core.exceptions import ObjectDoesNotExist
 import schedule
 from rest_framework import generics

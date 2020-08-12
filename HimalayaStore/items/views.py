@@ -6,6 +6,7 @@ from .models import ItemModel
 from requirements import success, error
 from .serializers import ItemSerializer
 from django.core.exceptions import EmptyResultSet
+from rest_framework.permissions import IsAuthenticated
 
 class ItemView(APIView):
     permission_classes = [(IsAuthenticated)]

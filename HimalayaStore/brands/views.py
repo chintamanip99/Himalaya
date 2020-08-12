@@ -7,7 +7,8 @@ from .models import BrandModel
 from requirements import success, error
 from .serializers import BrandSerializer
 from django.core.exceptions import EmptyResultSet
-from rest_framework.decorators import api_view
+from rest_framework.decorators import api_view,permission_classes
+from rest_framework.permissions import IsAuthenticated
 
 class BrandView(APIView):
     permission_classes = [(IsAuthenticated)]
