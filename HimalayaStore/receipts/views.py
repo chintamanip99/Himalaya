@@ -14,9 +14,10 @@ from io import BytesIO
 from django.core.files import File
 from .utils import render_to_pdf
 from rest_framework.pagination import PageNumberPagination
-from .serializers import ReceiptsSerializer
+from .serializers import ReceiptsSerializer,ReceiptsSerializerForSales
 from rest_framework.views import APIView
 from rest_framework import filters
+from django.db.models import Count,Sum
 # Create your views here.
 class StandardResultsSetPagination(PageNumberPagination,APIView):
     page_size = Receipts.objects.all().count()
@@ -99,9 +100,16 @@ class Receipt(generics.ListAPIView):
 
 class SalesForGraph(generics.ListAPIView):
 	permission_classes = [(IsAuthenticated)]
-	parser_class = (FileUploadParser,MultiPartParser,FormParser,JSONParser)
-	pagination_class=StandardResultsSetPagination
-	queryset=Receipts.objects.filter(date_time__date=datetime.datetime.today()).order_by('-date_time')
-	serializer_class=ReceiptsSerializer
-	filter_backends = [filters.SearchFilter]
-	search_fields  = ['customer__fname','customer__lname','customer__mobile']
+
+	def get(self,request):
+		try:
+			success_message={}
+			total_amount_paid=0.0
+			print(Receipts.objects.all().values('date_time__date').order_by('-date_time__date').annotate(total_amount_collected=Sum('amount_payable')))
+			date_wise_payment_list=[{str(i['date_time__date']):i['total_amount_collected']} for i in Receipts.objects.all().values('date_time__date').order_by('-date_time__date').annotate(total_amount_collected=Sum('amount_payable'))]
+			success_message.update({'date_wise_payment_list':date_wise_payment_list})
+			response=success.APIResponse(200,success_message).respond()
+		except Exception as unknown_exception:
+			response=error.APIErrorResponse(404,str(unknown_exception)).respond()
+		finally:
+			return Response(response)

@@ -6,6 +6,7 @@ class BrandModel(models.Model):
     name=models.CharField(max_length=50)
     quantity=models.IntegerField(null=True)
     cost_price=models.FloatField(null=False, blank=0.0, default=0.0)
+    initial_discount=models.FloatField(null=True, blank=0.0, default=0.0)
 
     def __str__(self):
         return self.item.name+" "+self.name+" "+str(self.quantity)+"id:"+str(self.id)

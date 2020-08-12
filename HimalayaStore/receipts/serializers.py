@@ -10,3 +10,8 @@ class ReceiptsSerializer(serializers.ModelSerializer):
 	class Meta:
 		model=Receipts
 		exclude=[]
+
+class ReceiptsSerializerForSales(serializers.ModelSerializer):
+	class Meta:
+		model=Receipts
+		exclude=['customer','payment_method']

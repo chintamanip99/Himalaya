@@ -7,5 +7,5 @@ app_name="receipts"
 
 urlpatterns = [
 	path('',Receipt.as_view()),
-	path('sales_for_graph',SalesForGraph.as_view()),
+	path('sales_for_graph/',SalesForGraph.as_view()),
 ]
