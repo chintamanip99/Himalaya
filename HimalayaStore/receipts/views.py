@@ -83,7 +83,7 @@ class Receipt(generics.ListAPIView):
 						brand=BrandModel.objects.get(id=int(i['brand']))
 						if brand.quantity<i['quantity']:
 							proceed=False
-							out_of_stock_messages.append({'Only '+str(brand.quantity)+" "+brand.item.name+" of the Brand "+brand.name+" are left in Your Stock"})
+							out_of_stock_messages.append('Only '+str(brand.quantity)+" "+brand.item.name+" of the Brand "+brand.name+" are left in Your Stock")
 					if(proceed):
 						for i in request.data['items']:
 							brand=BrandModel.objects.get(id=int(i['brand']))
