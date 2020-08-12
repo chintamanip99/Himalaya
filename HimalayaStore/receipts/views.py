@@ -44,7 +44,7 @@ class Receipt(generics.ListAPIView):
 	permission_classes = [(IsAuthenticated)]
 	parser_class = (FileUploadParser,MultiPartParser,FormParser,JSONParser)
 	pagination_class=StandardResultsSetPagination
-	queryset=Receipts.objects.filter(date_time__date=datetime.datetime.today())
+	queryset=Receipts.objects.filter(date_time__date=datetime.datetime.today()).order_by('-id')
 	serializer_class=ReceiptsSerializer
 	filter_backends = [filters.SearchFilter]
 	search_fields  = ['customer__fname','customer__lname','customer__mobile']
@@ -106,7 +106,7 @@ class SalesForGraph(generics.ListAPIView):
 			success_message={}
 			total_amount_paid=0.0
 			print(Receipts.objects.all().values('date_time__date').order_by('-date_time__date').annotate(total_amount_collected=Sum('amount_payable')))
-			date_wise_payment_list=[{str(i['date_time__date']):i['total_amount_collected']} for i in Receipts.objects.all().values('date_time__date').order_by('-date_time__date').annotate(total_amount_collected=Sum('amount_payable'))]
+			date_wise_payment_list=[{'date':str(i['date_time__date']).split('-')[2]+"-"+str(i['date_time__date']).split('-')[1]+"-"+str(i['date_time__date']).split('-')[0],'amount':i['total_amount_collected']} for i in Receipts.objects.all().values('date_time__date').order_by('-date_time__date').annotate(total_amount_collected=Sum('amount_payable'))]
 			success_message.update({'date_wise_payment_list':date_wise_payment_list})
 			response=success.APIResponse(200,success_message).respond()
 		except Exception as unknown_exception:

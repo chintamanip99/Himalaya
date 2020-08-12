@@ -5,6 +5,7 @@ from payment.serializers import PaymentSerializer
 from customers.serializers import CustomerSerializer
 
 class ReceiptsSerializer(serializers.ModelSerializer):
+	date_time=serializers.DateTimeField(format='%m/%d/%Y')
 	payment_method=PaymentSerializer()
 	customer=CustomerSerializer()
 	class Meta:

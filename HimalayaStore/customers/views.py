@@ -46,7 +46,7 @@ class Customer(generics.ListAPIView):
 	permission_classes = [(IsAuthenticated)]
 	parser_class = (FileUploadParser,MultiPartParser,FormParser,JSONParser)
 	pagination_class=StandardResultsSetPagination
-	queryset=Customer.objects.all()
+	queryset=Customer.objects.all().order_by('-id')
 	serializer_class=CustomerSerializer
 	filter_backends = [filters.SearchFilter]
 	search_fields  = ['fname','fname',' mobile']
@@ -78,7 +78,7 @@ class Customer(generics.ListAPIView):
 				except Customer.DoesNotExist:
 					response_message=error.APIErrorResponse(404,{'customer_doesnt_exist':'customer_doesnt_exist'}).respond()
 			else:
-				response_message=error.APIErrorResponse(404,{' mobile':' mobile is mandatory field'}).respond()
+				response_message=error.APIErrorResponse(404,{'mobile':' mobile is mandatory field'}).respond()
 		except Exception as e:
 			response_message=error.APIErrorResponse(404,{'error1':str(e)}).respond()
 		finally:
