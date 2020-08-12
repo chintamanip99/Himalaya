@@ -77,20 +77,31 @@ class Receipt(generics.ListAPIView):
 						date_time=datetime.datetime.now().replace(tzinfo=None)
 						)
 					receipt.save()
+					out_of_stock_messages=[]
+					proceed=True
 					for i in request.data['items']:
-						sales=Sales.objects.create(
-							receipt=receipt,
-							brand=BrandModel.objects.get(id=int(i['brand'])),
-							quantity=int(i['quantity']),
-							selling_price=float(i['selling_price'])
-							)
-						sales.save()
-					context = {'receipt':receipt,'sales_list':Sales.objects.filter(receipt=receipt)}
-					pdf = render_to_pdf('invoice.html', context)
-					filename = receipt.customer.fname+"_"+receipt.customer.lname+"_"+str(receipt.date_time.date())+"_"+str(receipt.date_time.time())+".pdf"
-					receipt.receipt_pdf.save(filename, File(BytesIO(pdf.content)))
-					receipt.save()
-					response_message=success.APIResponse(200,{'receipt_link':receipt.receipt_pdf.url}).respond()
+						brand=BrandModel.objects.get(id=int(i['brand']))
+						if brand.quantity<i['quantity']:
+							proceed=False
+							out_of_stock_messages.append({'Only '+str(brand.quantity)+" "+brand.item.name+" of the Brand "+brand.name+" are left in Your Stock"})
+					if(proceed):
+						for i in request.data['items']:
+							brand=BrandModel.objects.get(id=int(i['brand']))
+							sales=Sales.objects.create(
+								receipt=receipt,
+								brand=brand,
+								quantity=int(i['quantity']),
+								selling_price=float(i['selling_price'])
+								)
+							sales.save()
+						context = {'receipt':receipt,'sales_list':Sales.objects.filter(receipt=receipt)}
+						pdf = render_to_pdf('invoice.html', context)
+						filename = receipt.customer.fname+"_"+receipt.customer.lname+"_"+str(receipt.date_time.date())+"_"+str(receipt.date_time.time())+".pdf"
+						receipt.receipt_pdf.save(filename, File(BytesIO(pdf.content)))
+						receipt.save()
+						response_message=success.APIResponse(200,{'success':True,'receipt_link':receipt.receipt_pdf.url}).respond()
+					else:
+						response_message=error.APIErrorResponse(404,{'success':False,'out_of_stock_messages':out_of_stock_messages}).respond()
 			else:
 				response_message=error.APIErrorResponse(404,{'invalid_customer_credentials':'Invalid Customer Credentials'}).respond()
 		except Exception as e:
